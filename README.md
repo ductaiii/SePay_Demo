@@ -93,7 +93,7 @@ Chọn các tuỳ chọn:
 
 3. **Kiểm tra trạng thái thanh toán:**
      - Backend gọi API SePay lấy danh sách giao dịch:
-         `https://my.sepay.vn/userapi/transactions/list?account_number=10367909181&limit=20`
+         `https://my.sepay.vn/userapi/transactions/list?account_number=SO_TAI_KHOAN&limit=20`
      - Token API lấy từ SePay.
      - Cứ mỗi 15 giây, backend gọi lại API, lưu các giao dịch mới vào bảng `transactions`.
      - So sánh các giao dịch mới với nội dung chuyển khoản, lọc ra mã đơn hàng (XXX).
