@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import './App.css' // Import file CSS vừa tạo
 
@@ -111,7 +111,8 @@ function App() {
               Đặt Hàng
             </h1>
             <div className="form-group">
-              <label className="form-label">Số tiền</label>
+              <label className="form-label">Số tiền</label
+              >
               <input
                 type="number"
                 className="form-control"
