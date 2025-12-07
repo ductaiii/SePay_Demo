@@ -10,6 +10,8 @@ services:
       POSTGRES_DB: ${DB_NAME:-sepay}
     volumes:
       - db_data:/var/lib/postgresql/data
+      # auto-init the database on first run from the local schema file
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
     ports:
       - "5432:5432"
 
@@ -19,7 +21,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     env_file:
-      - ./server/.env.example
+      ./server/.env
     environment:
       DB_HOST: db
       DB_PORT: 5432

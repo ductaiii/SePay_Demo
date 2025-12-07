@@ -34,7 +34,7 @@
 
 ## Cấu trúc thư mục dự án (hiện tại)
 
-``text
+```text
 sepay-payment-app/
 ├── database/                   # Chứa câu lệnh SQL
 │   └── schema.sql
