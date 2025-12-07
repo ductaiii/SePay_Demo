@@ -15,7 +15,6 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "start": "ts-node index.ts",
-    "worker": "ts-node worker.ts"
+    "start": "ts-node index.ts"
   }
 }
