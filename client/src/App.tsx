@@ -11,7 +11,9 @@ interface OrderResponse {
 
 type OrderStatus = 'PENDING' | 'PAID' | 'EXPIRED'
 
-const API_URL = 'http://localhost:3000/api'
+// Lấy URL backend từ biến môi trường Vite (VITE_API_URL).
+// Vercel sẽ inject biến này khi build; khi phát triển local, tạo file `.env.local` ở thư mục `client`.
+const API_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000/api'
 
 function App() {
   const [step, setStep] = useState<number>(1)
