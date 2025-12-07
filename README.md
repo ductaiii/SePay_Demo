@@ -32,30 +32,66 @@
 - **Database:** PostgreSQL – Lưu trữ thông tin đơn hàng và giao dịch.
 
 
-## Cấu trúc thư mục dự án
+## Cấu trúc thư mục dự án (hiện tại)
 
 ```text
 sepay-payment-app/
 ├── database/                   # Chứa câu lệnh SQL
 │   └── schema.sql
-├── server/                     # Backend (Node.js + Express)
-│   ├── .env                    # Biến môi trường (Token, DB Config)
+├── docker-compose.yml          # Compose file (db, server, client, adminer, pgadmin)
+├── server/                     # Backend (TypeScript, Express)
+│   ├── .env.example            # Mẫu biến môi trường (DB + SePay)
+│   ├── Dockerfile              # Dockerfile cho backend (ts-node / dev)
+│   ├── tsconfig.json
+│   ├── index.ts                # Entry point (API + embedded worker)
 │   ├── config/
-│   │   └── db.js               # Kết nối PostgreSQL
-│   ├── controllers/
-│   │   └── orderController.js  # Logic xử lý đơn hàng
-│   ├── worker.js               # Worker chạy ngầm (Sync SePay)
-│   ├── index.js                # Entry point của API Server
+│   │   └── db.ts               # Kết nối PostgreSQL (Pool)
+│   ├── controller/             # Controller / route handlers
 │   └── package.json
-└── client/                     # Frontend (ReactJS - Vite)
-    ├── src/
-    │   ├── components/
-    │   │   ├── Home.jsx
-    │   │   └── Payment.jsx
-    │   ├── App.jsx
-    │   └── main.jsx
-    └── package.json
+└── client/                     # Frontend (React + Vite, TypeScript)
+    ├── Dockerfile              # Dockerfile dev for Vite
+    ├── package.json
+    └── src/
+        ├── App.tsx
+        ├── main.tsx
+        └── assets/
+
 ```
+
+## Docker & chạy nhanh (dev)
+
+Project đã bao gồm `docker-compose.yml` để chạy 4 service chính:
+
+- db: Postgres (port 5432)
+- server: backend (port 3000)
+- client: Vite dev server (port 5173)
+- adminer: GUI nhẹ để quản lý Postgres (port 8080)
+- pgadmin: pgAdmin4 (port 5050)
+
+Lệnh khởi động (tại thư mục gốc chứa `docker-compose.yml`):
+
+```powershell
+docker-compose up --build -d
+```
+
+Mở các dịch vụ:
+
+- Frontend (Vite dev): [http://localhost:5173](http://localhost:5173)
+- Backend API: [http://localhost:3000](http://localhost:3000)
+- Adminer: [http://localhost:8080](http://localhost:8080)
+- pgAdmin: [http://localhost:5050](http://localhost:5050)
+
+Import schema database (PowerShell):
+
+```powershell
+# Từ thư mục gốc (PowerShell):
+Get-Content .\database\schema.sql -Raw | docker-compose exec -T db psql -U postgres -d sepay
+```
+
+Ghi chú:
+- `server/.env.example` chứa mẫu biến môi trường (DB credentials, SePay token, account number). Copy sang `server/.env` và chỉnh trước khi chạy.
+- Nếu bạn thay đổi port host của Postgres hoặc đã dùng volume cũ, hãy kiểm tra mapping port (`docker-compose port db 5432`) hoặc xóa volume nếu muốn re-init database.
+
 
 ## Hướng dẫn khởi tạo dự án & cài đặt package
 
@@ -103,17 +139,26 @@ Chọn các tuỳ chọn:
 
 ### 1. Tạo QR Code VietQR
 
-- Sử dụng API:
-    `https://qr.sepay.vn/img?acc=SO_TAI_KHOAN&bank=NGAN_HANG&amount=SO_TIEN&des=NOI_DUNG&template=TEMPLATE&download=DOWNLOAD`
-    - `SO_TAI_KHOAN`: Số tài khoản ngân hàng.
-    - `NGAN_HANG`: Mã ngân hàng (xem [danh sách](https://qr.sepay.vn/banks.json)).
-    - `SO_TIEN`: Số tiền cần chuyển.
-    - `NOI_DUNG`: Nội dung chuyển khoản (ví dụ: Thanh Toán Đơn Hàng 456).
-    - `TEMPLATE`: Kiểu QR (để trống, `compact`, `qronly`).
-    - `DOWNLOAD`: `true` để tải về.
+Sử dụng API:
 
-- Ví dụ QR:
-    `https://qr.sepay.vn/img?bank=TPBank&acc=10367909181&template=compact&amount=2000&des=Thanh%20Toan%20Don%20Hang%20456`
+```text
+https://qr.sepay.vn/img?acc=SO_TAI_KHOAN&bank=NGAN_HANG&amount=SO_TIEN&des=NOI_DUNG&template=TEMPLATE&download=DOWNLOAD
+```
+
+Tham số:
+
+- `SO_TAI_KHOAN`: Số tài khoản ngân hàng.
+- `NGAN_HANG`: Mã ngân hàng (xem danh sách tại [https://qr.sepay.vn/banks.json](https://qr.sepay.vn/banks.json)).
+- `SO_TIEN`: Số tiền cần chuyển.
+- `NOI_DUNG`: Nội dung chuyển khoản (ví dụ: `Thanh Toán Đơn Hàng 456`).
+- `TEMPLATE`: Kiểu QR (ví dụ: `compact`, `qronly`).
+- `DOWNLOAD`: `true` để tải về.
+
+Ví dụ QR:
+
+```text
+https://qr.sepay.vn/img?bank=TPBank&acc=10367909181&template=compact&amount=2000&des=Thanh%20Toan%20Don%20Hang%20456
+```
 
 ### 2. Tạo API Token
 
